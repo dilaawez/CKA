@@ -1,0 +1,56 @@
+
+pwd
+
+echo "Hello!" or echo Hello!
+
+uptime
+
+man echo #use man command to know more about any command.
+
+================================================================================================================
+Type	                Description
+Internal Commands	    Built into the shell (e.g. Bash), no separate executable file. Fast, always available.
+External Commands	    Stored as separate binaries (usually in /bin, /usr/bin). Run by calling the binary.
+
+Linux Internal vs External Commands – Table
+--------------------------------------------
+Command	        Type	        Description	                    How to Check
+cd	            Internal	    Change directory	            type cd → cd is a shell builtin
+echo	        Internal	    Print to terminal	            type echo
+pwd	            Internal	    Show current directory	        type pwd
+exit	        Internal	    Exit shell session	            type exit
+export	        Internal	    Set environment variable	    type export
+alias	        Internal	    Create command shortcuts	    type alias
+read	        Internal	    Read user input	                type read
+set	            Internal	    Set shell variables / options	type set
+umask	        Internal	    Set default permission mask	    type umask
+history	        Internal	    Show command history	        type history
+
+Command	        Type	        Description	                    Where It's Stored
+ls	            External	    List directory contents	        /bin/ls
+cp	            External	    Copy files/directories	        /bin/cp
+mv	            External	    Move/rename files	            /bin/mv
+rm	            External	    Remove files	                /bin/rm
+mkdir	        External	    Create directory	            /bin/mkdir
+ping	        External	    Send ICMP packets	            /bin/ping or /usr/bin/ping
+top	            External	    Show processes/resources	    /usr/bin/top
+ps	            External	    Process snapshot	            /bin/ps
+netstat	        External	    Show network connections	    /usr/bin/netstat
+find	        External	    Find files	                    /usr/bin/find
+grep	        External	    Search inside files	            /bin/grep
+df	            External	    Show disk space	                /bin/df
+tar	            External	    Archive files	                /bin/tar
+curl	        External	    Transfer data over network	    /usr/bin/curl
+systemctl	    External	    Manage system services (systemd)/bin/systemctl
+================================================================================================================
+
+type echo #use type command to know whether a command is internal or External.
+
+mkdir directory
+
+mkdir -p directory1/{directory2,directory3} #To have folder structure as directory1/directory2 and directory1/directory3
+
+
+
+
+

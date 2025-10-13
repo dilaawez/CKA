@@ -1,3 +1,5 @@
+#
+    BASICCOMMANDS
 
 pwd
 
@@ -5,52 +7,134 @@ echo "Hello!" or echo Hello!
 
 uptime
 
-man echo #use man command to know more about any command.
+history             // To know history of commands that have been ran
 
-================================================================================================================
-Type	                Description
-Internal Commands	    Built into the shell (e.g. Bash), no separate executable file. Fast, always available.
-External Commands	    Stored as separate binaries (usually in /bin, /usr/bin). Run by calling the binary.
+#
 
-Linux Internal vs External Commands – Table
---------------------------------------------
-Command	        Type	        Description	                    How to Check
-cd	            Internal	    Change directory	            type cd → cd is a shell builtin
-echo	        Internal	    Print to terminal	            type echo
-pwd	            Internal	    Show current directory	        type pwd
-exit	        Internal	    Exit shell session	            type exit
-export	        Internal	    Set environment variable	    type export
-alias	        Internal	    Create command shortcuts	    type alias
-read	        Internal	    Read user input	                type read
-set	            Internal	    Set shell variables / options	type set
-umask	        Internal	    Set default permission mask	    type umask
-history	        Internal	    Show command history	        type history
+    HELP SYSTEM IN Linux
 
-Command	        Type	        Description	                    Where It's Stored
-ls	            External	    List directory contents	        /bin/ls
-cp	            External	    Copy files/directories	        /bin/cp
-mv	            External	    Move/rename files	            /bin/mv
-rm	            External	    Remove files	                /bin/rm
-mkdir	        External	    Create directory	            /bin/mkdir
-ping	        External	    Send ICMP packets	            /bin/ping or /usr/bin/ping
-top	            External	    Show processes/resources	    /usr/bin/top
-ps	            External	    Process snapshot	            /bin/ps
-netstat	        External	    Show network connections	    /usr/bin/netstat
-find	        External	    Find files	                    /usr/bin/find
-grep	        External	    Search inside files	            /bin/grep
-df	            External	    Show disk space	                /bin/df
-tar	            External	    Archive files	                /bin/tar
-curl	        External	    Transfer data over network	    /usr/bin/curl
-systemctl	    External	    Manage system services (systemd)/bin/systemctl
-================================================================================================================
+                    // To know a short summary of what a command does.
+    
+whatis ls
+ls (1)               - list directory contents
 
-type echo #use type command to know whether a command is internal or External.
+                    // To get help content of a command on screen
 
-mkdir directory
+ls --help
+
+                    // To open the man pages of commands
+
+man ls
+
+man echo            // use man command to know more about any command.
+
+#
+
+apropos man         // Each manual page has a short description available within it.  apropos searches the descriptions for instances of keyword.
+
+#
+
+    TYPE OF Commands
+
+    ================================================================================================================
+    Type	                Description
+    Internal Commands	    Built into the shell (e.g. Bash), no separate executable file. Fast, always available.
+    External Commands	    Stored as separate binaries (usually in /bin, /usr/bin). Run by calling the binary.
+
+    Linux Internal vs External Commands – Table
+    --------------------------------------------
+    Command	        Type	        Description	                    How to Check
+    cd	            Internal	    Change directory	            type cd → cd is a shell builtin
+    echo	        Internal	    Print to terminal	            type echo
+    pwd	            Internal	    Show current directory	        type pwd
+    exit	        Internal	    Exit shell session	            type exit
+    export	        Internal	    Set environment variable	    type export
+    alias	        Internal	    Create command shortcuts	    type alias
+    read	        Internal	    Read user input	                type read
+    set	            Internal	    Set shell variables / options	type set
+    umask	        Internal	    Set default permission mask	    type umask
+    history	        Internal	    Show command history	        type history
+
+    Command	        Type	        Description	                    Where It's Stored
+    ls	            External	    List directory contents	        /bin/ls
+    cp	            External	    Copy files/directories	        /bin/cp
+    mv	            External	    Move/rename files	            /bin/mv
+    rm	            External	    Remove files	                /bin/rm
+    mkdir	        External	    Create directory	            /bin/mkdir
+    ping	        External	    Send ICMP packets	            /bin/ping or /usr/bin/ping
+    top	            External	    Show processes/resources	    /usr/bin/top
+    ps	            External	    Process snapshot	            /bin/ps
+    netstat	        External	    Show network connections	    /usr/bin/netstat
+    find	        External	    Find files	                    /usr/bin/find
+    grep	        External	    Search inside files	            /bin/grep
+    df	            External	    Show disk space	                /bin/df
+    tar	            External	    Archive files	                /bin/tar
+    curl	        External	    Transfer data over network	    /usr/bin/curl
+    systemctl	    External	    Manage system services (systemd)/bin/systemctl
+    ================================================================================================================
+
+#
+
+    type echo #use type command to know whether a command is internal or External.
+
+#
+
+    mkdir directory     // To create a directory
 
 mkdir -p directory1/{directory2,directory3} #To have folder structure as directory1/directory2 and directory1/directory3
 
+#
+
+    touch file          // To create a file
+
+touch directory1/directory2/file.txt          // creates a file with name file.txt
+
+#
+
+    To view the folder structure of any directory
+
+tree
+
+ls -R
+
+#
+
+                        // Scroll and search within the file
+
+        more
+
+        [Space] - scrolls the display, one screensful of data at a time.
+        [Enter] - scrolls the display one line.
+        [b] - scrolls the display backwards one screenful of data.
+        [/] - search text
+
+more file.txt
+
+        less
+        [Up Arrow] - scrolls up the display one line.
+        [Down Arrow] - scrolls down the display one line.
+        [/] - search text
+
+less file.txt
+
+#
+
+    SHELLS : A shell is a command-line interpreter. It takes the commands you type and passes them to the Linux kernel to execute.
+
+    Main Types of Shells
+    Shell	                            Path (usually)	        Description
+    Bourne Shell (sh)	                /bin/sh	                The original Unix shell; basic and fast
+    Bash (Bourne Again Shell)	        /bin/bash	            Most popular; default on many systems
+    Zsh (Z Shell)	                    /bin/zsh	            Advanced features, customization, oh-my-zsh themes
+    Korn Shell (ksh)	                /bin/ksh	            Combines features of sh and csh; used in enterprises
+    C Shell (csh)	                    /bin/csh	            C-like syntax, mostly historical
+    Fish (Friendly Interactive Shell)	/usr/bin/fish	        Modern, user-friendly with syntax highlighting
 
 
+echo $SHELL                 // To know which shell is in use
+
+chsh                        // To change the shell
+
+alias dt=date               // Setting an alias for dat command
 
 

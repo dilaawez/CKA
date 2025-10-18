@@ -137,4 +137,915 @@ chsh                        // To change the shell
 
 alias dt=date               // Setting an alias for dat command
 
+#
 
+    ENVIRONMENT VARIABLES
+
+env                         // To display all variables in the shell environment.
+
+echo $SHELL                 // To display value stored in a single variable.
+echo $LOGNAME
+
+export OFFICE=Caleston      // To set value of a variable.
+OFFICE=Caleston             // Variable value set only for the current session.
+
+    ~/.profile
+    or
+    ~/.pam_environment      // To make the values of variables permanent over reboots, set them in the user profile.
+
+#
+
+    PATH VARIABLE
+    When a user issues an external command into the shell, the shell uses a path variable to search for these external commands.
+
+echo $PATH                  // To see the directories defined in the $PATH variable.
+                            NOTE : If the path variable does not have the location of a command or a program defined, running a command by itself will result in a failure.
+
+which obs-studio           // To check if the location of a command (obs-studio) can be identified.
+export PATH=$PATH:/opt/obs/bin // To add the path of a command (obs-studio) in $PATH environment variable.
+which obs-studio            // It should display the path [opt/obs/bin/obs-studio] as output.
+
+
+#
+
+    BASH PROMPT
+    It shows the logged in user and host systems details, it is editable.
+
+[user@hostname]$        // This can be like [michael@prod-server]$
+                        // $ is a User Prompt Symbol
+
+    The bash prompt is controlled by special shell environment variables, one common one is PS1.
+    PS1 : Prompt definition, the variable that defines what your terminal prompt looks like in bash.
+
+    🧱 1️⃣ Basic printable characters
+
+    You can use any normal text (letters, numbers, punctuation, emojis, etc.) directly in PS1.
+
+    Example:
+    PS1="Hello > "
+
+    Produces:
+    Hello >
+
+
+    ✅ Allowed:
+
+    Letters: a-z A-Z
+
+    Numbers: 0-9
+
+    Symbols: !@#$%^&*()[]{}<>?/|;:'",.=-+_
+
+    Emojis and Unicode (✅ e.g. PS1="🐧 \u@\h \$ ")
+
+
+    🧩 2️⃣ Backslash escapes (special \ sequences)
+
+    These are special placeholders Bash replaces dynamically.
+
+    Here’s the full list (from the official Bash manual):
+
+    Sequence	                        Meaning	                                            Example Output
+    \a	                                ASCII bell (beep)	                                🔔 sound
+    \d	                                Date (e.g., "Sat Oct 18")	                        Sat Oct 18
+    \D{format}	                        Custom date/time (strftime format)	                \D{%F %T} → 2025-10-18 14:42:00
+    \e	                                Escape character (useful for colors)	            —
+    \h	                                Hostname (short)	                                debian
+    \H	                                Full hostname	                                    debian.localdomain
+    \j	                                Number of jobs currently managed by shell	        0
+    \l	                                Terminal device name (basename of tty)	            pts/0
+    \n	                                Newline	                                            (starts a new line)
+    \r	                                Carriage return	                                    —
+    \s	                                Shell name	                                        bash
+    \t	                                Current time (HH:MM:SS)	                            14:42:36
+    \T	                                Time (12-hour, with AM/PM)	                        02:42:36 PM
+    \@	                                Time (12-hour with am/pm)	                        02:42 pm
+    \A	                                Time (24-hour HH:MM)	                            14:42
+    \u	                                Username	                                        alice
+    \v	                                Bash version (short)	                            5.2
+    \V	                                Bash version (long, e.g. 5.2.15)	                5.2.15
+    \w	                                Current working directory	                        /home/alice/projects
+    \W	                                Basename of \w (last part)	                        projects
+    \!	                                History number of this command	                    132
+    \#	                                Command number (since shell start)	                24
+    \$	                                $ for user, # for root	                            $
+    \nnn	                            Character with octal value nnn	                    e.g., \007 = BEL
+    \\	                                A literal backslash	                                \
+    \[	                                Start of non-printing sequence (for color codes)	—
+    \]	                                End of non-printing sequence	                    —
+
+
+    🎨 3️⃣ ANSI color codes and formatting
+
+    You can include ANSI escape codes to add color and style.
+    You must wrap them in \[ \] to tell Bash they don’t take up screen space.
+
+    Example	            Description
+    \[\e[0m\]	        Reset all colors
+    \[\e[31m\]	        Red text
+    \[\e[32m\]	        Green text
+    \[\e[33m\]	        Yellow text
+    \[\e[34m\]	        Blue text
+    \[\e[1m\]	        Bold
+    \[\e[4m\]	        Underline
+
+    Example:
+
+    PS1="\[\e[1;32m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\$ "
+
+    → Shows green user@host, blue directory, and resets after.
+
+
+    ⚙️ 4️⃣ Variable and command substitutions
+
+    You can embed shell variables or even commands in your prompt.
+
+    🧮 Variables:
+    PS1="[$USER@$HOSTNAME] "
+
+
+    → [alice@debian]
+
+    ⚡ Command substitution:
+    PS1="\u@\h:\$(date +%H:%M)\$ "
+
+
+    → alice@debian:14:43$
+
+    (Note: use \$() not backticks, and escape $ if needed.)
+
+
+    🧠 5️⃣ Conditional or dynamic parts
+
+    You can include Bash expressions like:
+
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+
+
+    → Only prints ($debian_chroot) if that variable is set.
+
+
+    ⚠️ 6️⃣ What NOT to do
+
+    ❌ Don’t forget to wrap non-printing sequences (color codes) with \[ \].
+
+    Otherwise, line wrapping breaks.
+
+    ❌ Don’t use raw control characters (except through escapes).
+
+    ❌ Avoid very long or slow command substitutions — they’ll make your prompt lag.
+
+
+    ✅ 7️⃣ Example: A fancy colored PS1
+
+    PS1='\[\e[1;32m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\[\e[1;33m\] $(date +%H:%M:%S)\[\e[0m\]\$ '
+
+
+    Might look like:
+
+    alice@debian:/home/alice/projects 14:45:12$
+
+    (with username green, path blue, time yellow)
+#
+
+echo $PS1
+\[\]\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ \[\]
+
+    
+    1️⃣ What is $PS1?
+
+    $PS1 is the primary prompt string — it tells Bash what to display when waiting for a command.
+
+    If $PS1 contains \u@\h:\w\$ , your prompt might look like:
+
+user@hostname:/home/user$
+
+    
+    2️⃣ Let’s decode your PS1 step by step
+
+SEGMENT 1: \[\]\[\e]0;\u@\h: \w\a\]
+
+    \e = ESC (start of an escape sequence)
+
+    ]0;... = set terminal window title
+
+    \u = current username
+
+    \h = hostname (first part before .)
+
+    \w = current working directory
+
+    \a = BEL character (ends the title-setting command)
+
+    \[ and \] = mark “non-printing characters” (so Bash can correctly handle cursor position and line wrapping)
+
+
+    🧠 So this portion sets your terminal title bar (not the visible prompt line).
+
+    ✅ Example:
+    If your user is alice, host is debian, and you’re in /home/alice/projects,
+    your terminal window title (the title bar, not the prompt) becomes:
+
+    alice@debian: /home/alice/projects
+
+
+SEGMENT 2: ${debian_chroot:+($debian_chroot)}
+
+    ${var:+value} means: if $var is set and non-empty, substitute value; otherwise, substitute nothing.
+
+    So:
+
+    If you are inside a Debian chroot environment (e.g. /etc/debian_chroot exists), this shows something like (chrootname)
+
+    Otherwise, nothing is displayed.
+
+    ✅ Example:
+    If $debian_chroot=“buster”, this part becomes:
+
+    (buster)
+
+
+SEGMENT 3: \[\033[01;32m\]\u@\h\[\033[00m\]
+
+    This sets colored text for username@hostname.
+
+    \033 = ESC (same as \e)
+
+    [01;32m = bright green text
+
+    \u@\h = username@hostname
+
+    [00m = reset color to default
+
+    ✅ Example:
+    Appears as:
+
+    alice@debian
+
+    (in green)
+
+
+SEGMENT 4: :
+
+    Just a literal colon separating the hostname from the working directory.
+
+
+SEGMENT 5: \[\033[01;34m\]\w\[\033[00m\]
+
+    Same color pattern:
+
+    \033[01;34m = bright blue
+
+    \w = current directory (full path, but with ~ for home)
+
+    \033[00m = reset color
+
+    ✅ Example:
+
+    If you are in /home/alice/projects, this appears as:
+
+    /home/alice/projects
+
+    (in blue)
+
+
+SEGMENT 6: \$
+
+    \$ = prints # if you are root, $ if you are normal user
+
+    = a space for readability
+
+    ✅ Example:
+
+    $
+
+    (for regular user)
+    or
+
+    #
+
+    (for root)
+
+
+SEGMENT 7: \[\]
+
+    These empty \[ \] pairs mark the end — they don’t change anything; just delimit non-printing characters.
+
+    ✅ Final Output Example
+
+    If:
+
+    user = alice
+
+    host = debian
+
+    directory = /home/alice/projects
+
+    not in chroot
+
+    normal user
+
+    You’ll see:
+
+    alice@debian:/home/alice/projects$ 
+
+
+    With:
+
+    alice@debian in green
+
+    /home/alice/projects in blue
+
+    $ in default color
+
+    Terminal window title set to “alice@debian: /home/alice/projects”
+
+
+🎨 Summary Table
+==================
+
+Code	                            Meaning	                            Example Output
+\u	                                Username	                        alice
+\h	                                Hostname	                        debian
+\w	                                Working directory	                /home/alice/projects
+\e / \033	                        Escape character for ANSI codes	    —
+[01;32m	                            Bright green text	                —
+[01;34m	                            Bright blue text	                —
+[00m	                            Reset color	                        —
+\$	                                $ (user) or # (root)	            $
+${debian_chroot:+($debian_chroot)}	Show chroot name if set	            (buster)
+\[ \]	                            Mark non-printing sequences	        —
+
+
+#
+
+    LINUX KERNEL
+    It is a major component of an operating system and is the core interface between a computer's hardware and its processes.
+
+    +-------------------------------------------------------+
+    |                    User Space                         |
+    |-------------------------------------------------------|
+    |  Applications / User Programs                         |
+    |  (e.g., Browser, Editor, Games, etc.)                 |
+    |                                                       |
+    |  -> Interact with the kernel via System Calls (API)   |
+    +-------------------------------------------------------+
+                            |
+                            |  System Calls / Interrupts
+                            v
+    +-------------------------------------------------------+
+    |                    Kernel Space                       |
+    |-------------------------------------------------------|
+    |  KERNEL = Core part of the Operating System           |
+    |                                                       |
+    |  - Process Management                                 |
+    |  - Memory Management                                  |
+    |  - Device Drivers                                     |
+    |  - File System Management                             |
+    |  - Networking Stack                                   |
+    |                                                       |
+    |  -> Mediates access between software and hardware     |
+    +-------------------------------------------------------+
+                            |
+                            |  Hardware Abstraction Layer
+                            v
+    +-------------------------------------------------------+
+    |                     Hardware                          |
+    |-------------------------------------------------------|
+    |  CPU | Memory | Disk | Devices | Network Interfaces   |
+    +-------------------------------------------------------+
+
+#
+
+    What the Kernel Does
+    ======================
+
+    Here are its main jobs (in plain language):
+
+    Manages memory – decides how RAM is used and shared among apps.
+
+    Controls processes – starts, stops, and schedules programs (CPU scheduling).
+
+    Handles hardware – communicates with the CPU, disks, keyboard, etc., through device drivers.
+
+    Manages system calls – lets apps safely ask the OS to do things (like read a file or send data).
+
+#
+
+    How It Works (Step-by-step Example)
+    =====================================
+
+    Let’s say you click “Save” in a text editor.
+
+    App (user program) says:
+
+    “Hey OS, please save this file!”
+
+    Library translates that request into a system call.
+
+    Kernel takes over:
+
+    Finds space on the disk,
+
+    Writes the data,
+
+    Updates the file system.
+
+    Hardware (disk) does the actual writing.
+
+    So the kernel makes sure everything happens safely and correctly — no app directly touches hardware.
+
+                    +-------------------------+
+                    |      User Programs      |
+                    +-----------+-------------+
+                                |
+                                |  System Calls (Requests)
+                                v
+    +------------------------------------------------------+
+    |                      KERNEL                          |
+    |------------------------------------------------------|
+    |  Process Control   → creates, runs, and stops tasks   |
+    |  Memory Manager    → gives programs RAM safely        |
+    |  File System       → reads/writes files               |
+    |  Device Drivers    → talks to hardware                |
+    |  Networking        → handles data over network        |
+    +------------------------------------------------------+
+                                |
+                                |  Hardware Instructions
+                                v
+    +------------------------------------------------------+
+    |                     HARDWARE                         |
+    |     CPU | Memory | Disk | Network | Devices          |
+    +------------------------------------------------------+
+
+
+#
+
+    Two “Worlds” Inside Your Computer
+    ==================================
+
+    The CPU runs in two main modes:
+
+    +--------------------+
+    | User Mode          | → Apps run here
+    | Limited Access     |
+    | Needs permission   |
+    +--------------------+
+            |
+            | System Call (Switch)
+            v
+    +--------------------+
+    | Kernel Mode        | → Kernel runs here
+    | Full access to HW  |
+    | Manages resources  |
+    +--------------------+
+
+#
+
+    +-------------------------------------------------------+
+    |                     User Space                        |
+    |-------------------------------------------------------|
+    |  Web Browser, Bash, Docker, kubelet, nginx, sshd      |
+    |  └─> Use system calls to ask kernel for resources     |
+    +-------------------------------------------------------+
+                        ↓   ↑  (system calls, interrupts)
+    +-------------------------------------------------------+
+    |                     Kernel Space                      |
+    |-------------------------------------------------------|
+    |  Memory Manager, Process Scheduler, File Systems      |
+    |  Network Stack, Device Drivers, Security Modules      |
+    +-------------------------------------------------------+
+                        ↓
+    +-------------------------------------------------------+
+    |                     Hardware                          |
+    |-------------------------------------------------------|
+    |  CPU, RAM, Disk, NIC, GPU, Devices                    |
+    +-------------------------------------------------------+
+
+
+
+    This separation keeps the system stable and secure —
+    if an app crashes, it doesn’t crash the whole system.
+
+#
+
+    User Space
+    ===========
+
+    These are programs and services that run in the normal, restricted mode.
+
+    Category	                        Examples	                                Notes
+    User Applications	                Chrome, VS Code, Firefox, Slack	            Directly used by users
+    System Utilities	                ls, cat, top, systemctl	                    Run commands and tools
+    Background Services (daemons)	    sshd, nginx, containerd, dockerd	        Managed by the OS but run in user space
+    Kubernetes Processes	            kubelet, kube-proxy, kube-apiserver, etcd	All these are user-space binaries that rely on the kernel to do real work
+    Shells	                            bash, zsh, fish	                            Where you type commands
+    User Libraries	                    libc, OpenSSL, glibc	                    Provide system call interfaces to the kernel
+
+    Key point:
+    -----------
+    User-space programs request services from the kernel using system calls — e.g., read files, open sockets, allocate memory.
+
+#
+
+    Kernel Space
+    =============
+
+    This is where core operating system components and device drivers live.
+
+    Category	                        Examples	                                                Notes
+    Core Kernel	                        Linux kernel itself (vmlinux)	                            Manages hardware, memory, CPU
+    Device Drivers	                    e1000e (Ethernet), nvme, usb-storage	                    Control physical devices
+    File Systems	                    ext4, xfs, btrfs, overlayfs	                                Handle file operations
+    Network Stack	                    netfilter, iptables, TCP/IP	                                Handles all network traffic
+    Process Scheduler	                Schedules CPU time for processes	                        Determines which process runs next
+    Memory Manager	                    Handles virtual memory, paging, caching	                    Ensures isolation between processes
+    Interrupt Handlers	                Handle hardware events (e.g., keyboard input, NIC packets)	Executed by kernel directly
+
+    Key point:
+    -----------
+    Kernel code runs with high privileges — a crash here can bring down the entire system.
+
+
+#
+
+    Summary
+    Aspect	                User Space	                    Kernel Space
+    Privilege Level	        Low (restricted)	            High (full access)
+    Crashes Affect	        Only that process	            Entire system
+    Runs What	            Apps, daemons, system tools	    Kernel, drivers, schedulers
+    Example Processes	    bash, nginx, kubelet	        ksoftirqd, systemd-udevd, ext4, netfilter
+    Interface	            System calls (API)	            Hardware interrupts, syscalls handler
+
+#
+
+    KERNEL VERSIONS
+    ================
+
+
+uname                       // To display information about the kernel.
+
+uname -r                    // To print the kernel version.
+
+
+6.6.87.2-microsoft-standard-WSL2
+
+
+    ┌──┬──┬────┬──┬──────────────────────────────┐
+    │6 │6 │87  │2 │ -microsoft-standard-WSL2     │
+    └──┴──┴────┴──┴──────────────────────────────┘
+    │  │   │   │             │
+    │  │   │   │             └─► Distro/Build Tag (WSL2 build by Microsoft)
+    │  │   │   └─► Optional local patch or revision (non-standard)
+    │  │   └─────► Patch version (bug fixes)
+    │  └──────────► Minor version (feature updates)
+    └─────────────► **Major version**
+
+
+    Kernel: 6.6.87.2-microsoft-standard-WSL2
+
+#
+
+    ┌────────────┬────────────┬────────────┬────────────┬────────────────────────────┐
+    │ Major (6)  │ Minor (6)  │ Patch (87) │ Rev (2)    │ Build Tag (WSL2)           │
+    └────────────┴────────────┴────────────┴────────────┴────────────────────────────┘
+
+#
+
+    Correct interpretation:
+    Part	                    Meaning	                        Example	                    Notes
+    6	                        Major version	                6	                        Big architectural release (Kernel 6.x series)
+    6	                        Minor version	                6	                        Adds new features, updates, and subsystem changes
+    87	                        Patch level	                    87	                        Bug and stability fixes
+    2	                        Local patch or rebuild revision	2	                        Used internally by distro maintainers (here, Microsoft’s WSL2 team)
+    -microsoft-standard-WSL2	Distro tag	                    -microsoft-standard-WSL2	Identifies this kernel as a custom Microsoft build for WSL2
+
+#
+
+    Why it looks confusing
+    ------------------------
+
+    Historically:
+
+    Before 2003, Linux used a three-number scheme (2.6.32 → major.minor.patch).
+
+    Now it’s two main numbers (major.minor), and the rest are patch/build identifiers.
+
+    So for:
+    
+    6.6.87.2
+
+
+    you can think of it as:
+    Kernel 6 (major) → Minor 6 → Patch 87 → Local revision 2
+
+#
+
+    How WSL2 adds extra info
+    -------------------------
+
+    Microsoft compiles its own Linux kernel for WSL2, and appends:
+
+    -microsoft-standard-WSL2
+
+
+    That’s not part of the Linux versioning scheme — it just tells you this kernel was built and tuned for Windows Subsystem for Linux 2.
+
+#
+
+    EXAMPLE - Connecting a USB drive to PC
+    ---------------------------------------
+
+STEP 1: Physical Connection (Hardware Layer)
+
+    - You insert the USB stick into the port.
+
+    Hardware
+    └── USB Connector → USB Controller (chip on motherboard)
+
+
+    - The USB controller detects a new electrical signal —
+
+    it notifies the CPU that a new USB device is connected via a hardware interrupt.
+
+
+ STEP 2: Kernel Interrupt Handling (Kernel Space)
+
+    - When the hardware interrupt fires:
+
+    The CPU switches into kernel mode.
+
+    The USB subsystem in the Linux kernel gets the signal.
+
+    The kernel loads or activates the correct USB driver.
+
+    Example kernel modules involved:
+
+    usbcore.ko        ← Core USB support
+    xhci_hcd.ko       ← USB 3.0 controller driver
+    usb_storage.ko    ← Generic USB mass storage driver
+    sd_mod.ko         ← SCSI disk module (for storage devices)
+
+
+    - The kernel now treats the USB stick like a block device and assigns it a name like /dev/sdb.
+
+
+ STEP 3: Device Initialization (Kernel Space)
+
+    The kernel:
+
+    Reads the USB device descriptor (metadata about the device).
+
+    Allocates resources (buffers, endpoints).
+
+    Registers the new device in /sys (sysfs) and /dev.
+
+    You can see this with:
+
+dmesg | tail                    // To display messages from an area of the kernel called the ring buffer, it contains hardware logs created durting kernel loading.
+dmesg | grep -i usb
+
+    You’ll get logs like:
+
+    [1234.567890] usb 2-1: new high-speed USB device number 4 using xhci_hcd
+    [1234.678901] usb 2-1: New USB device found, idVendor=0781, idProduct=5567
+    [1234.789012] scsi 6:0:0:0: Direct-Access     SanDisk  Ultra 16GB 1.00 PQ: 0 ANSI: 6
+    [1234.890123] sd 6:0:0:0: [sdb] 30535680 512-byte logical blocks
+
+
+    - At this point, the kernel fully recognizes the USB stick and exposes it to user space as /dev/sdb.
+
+ STEP 4: User Space Detection
+
+    - In user space, background services like udev or systemd-udevd detect the new device event from the kernel.
+
+    They:
+
+    Create a device file in /dev/ (like /dev/sdb1).
+
+    May automatically mount it (on desktop systems) using tools like udisks2 or gvfs.
+
+    You can see it:
+
+lsblk
+
+
+    Output:
+
+    sdb     8:16   1  14.5G  0 disk 
+    └─sdb1  8:17   1  14.5G  0 part  /media/user/USB
+
+
+ STEP 5: Mounting (User Space + Kernel Space)
+
+    When you or the system mounts the drive:
+
+    sudo mount /dev/sdb1 /media/usb
+
+
+    Here’s what happens:
+
+    User space command mount (binary) runs.
+
+    It makes a system call to the kernel’s VFS (Virtual File System) layer.
+
+    The kernel loads the correct filesystem driver (e.g., vfat.ko, exfat.ko, ntfs.ko).
+
+    The kernel reads the filesystem metadata and connects it to /media/usb.
+
+    Now the drive is accessible.
+
+
+STEP 6: Using the Drive (User Space ↔ Kernel Space)
+
+    When you open or copy a file:
+
+    User-space apps (cp, cat, file explorer) request reads/writes via system calls (read(), write()).
+
+    The kernel filesystem layer translates those requests into block I/O.
+
+    The USB storage driver sends data over the USB bus to/from the drive.
+
+    User Space
+    ↓
+    System Calls (read/write)
+    ↓
+    Kernel Space
+    ├── VFS → Filesystem driver (FAT, NTFS)
+    ├── Block layer
+    ├── USB storage driver
+    ↓
+    Hardware (USB Controller ↔ USB Drive)
+
+
+STEP 7: Safely Removing the Drive
+
+    When you click “Eject” or run:
+
+sudo umount /media/usb
+
+
+    User-space command umount calls kernel’s VFS to unmount.
+
+    The kernel:
+
+    Flushes any cached data to disk,
+
+    Releases file handles,
+
+    Notifies the USB driver subsystem.
+
+    Once idle, the USB driver signals the controller — safe to remove.
+
+
+#
+
+    UDEV
+    =====
+    udev (userspace /dev) is the device manager for the Linux kernel, operating in user space. It handles the dynamic creation and removal of device nodes in the /dev directory.
+
+    Responsibilities of udev:
+    --------------------------
+
+    Creates/removes device files under /dev dynamically when hardware is added/removed.
+
+    Applies permissions and ownership to devices.
+
+    Creates symlinks (like /dev/disk/by-uuid/).
+
+    Loads firmware if needed.
+
+    Runs user-defined scripts or actions when a device is detected (via udev rules).
+
+    
+    Example use case:
+
+    When you plug in a USB drive:
+
+    Kernel detects it and emits a udev event.
+
+    udev listens for these events and:
+
+    Creates the device node (e.g., /dev/sdb).
+
+    Applies rules (e.g., setting permissions, running a script).
+
+    Optionally triggers auto-mount (if configured via other subsystems).
+
+
+#
+
+    UDEVADM
+    ========
+    udevadm is the administrative tool to interact with the udev daemon. Think of it as the command-line interface to inspect, control, and debug udev.
+
+    Common udevadm commands:
+
+    Command	                        Purpose
+    udevadm info	                Query udev database for device information.
+    udevadm trigger	                Manually trigger udev events.                       // Useful after modifying udev rules to test them without rebooting.
+    udevadm settle	                Wait for all current events to finish.
+    udevadm monitor	                Watch udev events in real-time. (Listens to kernel uevents)
+    udevadm control	                Modify udev daemon behavior (e.g., reload rules).
+    udevadm control --reload-rules  Reload udev rules
+
+
+#
+
+    Where are the udev rules?
+    --------------------------
+
+    System rules: /usr/lib/udev/rules.d/
+
+    Admin/custom rules: /etc/udev/rules.d/
+
+    Udev rules have filenames like 10-local.rules or 99-usb.rules and define match-action pairs.
+
+#
+
+    LSPCI
+    ======
+    lspci is a command-line tool in Linux used to list all PCI (Peripheral Component Interconnect) devices on your system.
+
+    It's part of the "pciutils package" and provides details about hardware devices connected to the PCI bus such as such as graphics cards, network cards, USB controllers, sound cards, ethernet cards, RAID controllers, video cards, directly attached wireless adapters
+
+    PCI -> Peripheral Component Interconnect
+
+
+     What is the PCI bus?
+     ---------------------
+
+    The PCI bus is a hardware bus used for attaching peripheral devices to a computer's motherboard. Common on desktops, laptops, and servers.
+
+
+     What does lspci do?
+     --------------------
+
+    It reads from:
+
+    /sys/bus/pci/devices/
+
+    /proc/bus/pci/
+
+    And uses the PCI ID database to translate numeric IDs into human-readable names.
+
+$ lspci
+00:00.0 Host bridge: Intel Corporation 8th Gen Core Processor Host Bridge
+00:02.0 VGA compatible controller: Intel Corporation UHD Graphics 620
+00:14.0 USB controller: Intel Corporation Sunrise Point-LP USB 3.0 xHCI Controller
+00:1f.3 Audio device: Intel Corporation Sunrise Point-LP HD Audio
+
+    Each line shows:
+
+    Bus address (00:02.0)
+
+    Device class (VGA compatible controller)
+
+    Vendor & model (Intel Corporation UHD Graphics 620)
+
+
+    PCI ID Database
+    ---------------
+
+    To show readable vendor/device names, lspci uses:
+
+    /usr/share/misc/pci.ids or /usr/share/hwdata/pci.ids
+
+    You can update it with:
+
+#
+
+    LSBLK
+    ======
+    lsblk (List Block Devices) is a command-line utility in Linux used to list information about block devices — like hard drives, SSDs, USB drives, partitions, and loop devices.
+
+    It's part of the "util-linux" package and is commonly used for inspecting storage devices and their structure.
+
+    Basic Usage
+
+lsblk
+
+    Example output:
+
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+sda      8:0    0  500G  0 disk 
+├─sda1   8:1    0  100G  0 part /
+├─sda2   8:2    0  300G  0 part /home
+└─sda3   8:3    0  100G  0 part [SWAP]
+
+    Here:
+
+    sda is a disk
+
+    sda1, sda2, sda3 are partitions
+
+    Mounted at /, /home, and swap
+
+    Common Options
+    Command	            Description
+    lsblk -f	        Show filesystem info (type, UUID, label)
+    lsblk -a	        List all devices (including empty ones)
+    lsblk -d	        Only show top-level disks (not partitions)
+    lsblk -e 7	        Exclude loop devices (major number 7)
+    lsblk -o            NAME,SIZE,FSTYPE,MOUNTPOINT	Customize columns
+    lsblk -J	        JSON output (useful for scripts)

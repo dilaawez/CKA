@@ -989,6 +989,19 @@ sudo umount /media/usb
 
     And uses the PCI ID database to translate numeric IDs into human-readable names.
 
+
+    Basic Usage:
+    -------------
+
+    Command             Description
+    lspci               View all PCI devices
+    lspci -v            Get detailed info (verbose)
+    lspci -vv           Show even more details
+    lspci -k            Show kernel driver in use
+    lspci -mm           Show in machine-readable format
+    lspci -n            Display numeric device/vendor IDs
+
+
 $ lspci
 00:00.0 Host bridge: Intel Corporation 8th Gen Core Processor Host Bridge
 00:02.0 VGA compatible controller: Intel Corporation UHD Graphics 620
@@ -1049,3 +1062,142 @@ sda      8:0    0  500G  0 disk
     lsblk -e 7	        Exclude loop devices (major number 7)
     lsblk -o            NAME,SIZE,FSTYPE,MOUNTPOINT	Customize columns
     lsblk -J	        JSON output (useful for scripts)
+
+
+    Bonus Tip: Combine with blkid
+
+    lsblk is great for hierarchy and mount info.
+
+    blkid shows detailed filesystem metadata (UUIDs, labels, types).
+
+#
+
+    MAJOR-MINOR NUMBER and DEVICE TYPE
+    =============================
+
+    What is a Major Number?
+
+    The Major Number in Linux identifies the driver associated with a device.
+
+    When the kernel sees a device, it uses the major number to know which kernel module (driver) should handle that device.
+
+    Example:
+
+$ ls -l /dev/sda
+brw-rw---- 1 root disk **8, 0** Oct 18 10:00 /dev/sda
+
+    b → Block device
+    8 → Major number → Identifies the disk driver (sd for SCSI disks)
+    0 → Minor number → Identifies the specific device (e.g., partition or disk)
+
+
+    Major vs Minor Number
+    ----------------------
+
+    Number Type	            Meaning
+    Major	                Identifies the device driver
+    Minor	                Identifies the specific instance of the device the driver controls
+
+
+    Common Major Numbers
+    ---------------------
+    Major Number	        Device Type
+    8	                    SCSI/SATA disks (sd)
+    1	                    RAM disk (/dev/ram*)
+    3	                    IDE hard drives (hd)
+    7	                    Loop devices (/dev/loop*)
+    180	                    USB devices
+    202	                    Xen virtual block device
+    254	                    Device mapper (e.g., LVM)
+
+    You can see a full list in /proc/devices:
+    cat /proc/devices
+
+
+#
+
+    What is a Device Type?
+    =======================
+
+    Device types tell Linux how to interact with the device:
+
+    Type	            Description
+    b	                Block device – reads/writes data in blocks (e.g., disks, USB drives)
+    c	                Character device – reads/writes data as a stream (e.g., keyboards, serial ports)
+    p	                FIFO/pipe – for inter-process communication
+
+
+    Example:
+
+$ ls -l /dev/tty0
+crw--w---- 1 root tty 4, 0 Oct 18 10:00 /dev/tty0
+
+c → Character device
+4 → Major (TTY driver)
+0 → Minor
+
+
+#
+
+    LSCPU
+    ======
+    lscpu is a Linux command-line utility that displays CPU architecture information.
+    It's a quick way to inspect details about the system’s processor(s) — such as cores, threads, sockets, CPU family, virtualization support, and more.
+
+    It pulls information from /proc/cpuinfo and sysfs.
+
+
+    What does lscpu show?
+    -----------------------
+
+    Here’s a sample output:
+    Architecture:            x86_64
+    CPU op-mode(s):          32-bit, 64-bit
+    Byte Order:              Little Endian
+    CPU(s):                  8
+    On-line CPU(s) list:     0-7
+    Thread(s) per core:      2
+    Core(s) per socket:      4
+    Socket(s):               1
+    Vendor ID:               GenuineIntel
+    Model name:              Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz
+    Virtualization:          VT-x
+    L1d cache:               32K
+    L2 cache:                256K
+    L3 cache:                8192K
+
+
+    Key Fields Explained:
+
+    Field	                Meaning
+    Architecture	        CPU architecture (e.g., x86_64, aarch64)
+    CPU(s)	                Total number of logical processors (threads)
+    Thread(s) per core	    Indicates hyperthreading (2 = enabled)
+    Core(s) per socket	    Physical cores per CPU
+    Socket(s)	            Number of physical CPUs (usually 1 in laptops/desktops)
+    Model name	            CPU branding info
+    Virtualization	        Whether virtualization is supported (e.g., VT-x, AMD-V)
+    Caches	                Sizes of L1, L2, L3 CPU caches
+
+
+    Example Use Cases
+    
+    Command                 Description
+    lscpu                   Show CPU layout
+    lscpu -J                Display info in JSON format
+    lscpu --parse=NUMA      Show NUMA info (if applicable)
+    lscpu | grep '^CPU(s)'  Show only specific fields
+
+
+#
+
+    Difference vs /proc/cpuinfo
+    ----------------------------
+
+lscpu:              Structured, high-level summary (uses sysfs)
+
+/proc/cpuinfo:      Raw per-CPU core details (e.g., flags, bugs)
+
+Use cat /proc/cpuinfo if you need flags like sse4_2, vmx, aes, etc.
+
+

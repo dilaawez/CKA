@@ -1067,7 +1067,6 @@ sda      8:0    0  500G  0 disk
     Bonus Tip: Combine with blkid
 
     lsblk is great for hierarchy and mount info.
-
     blkid shows detailed filesystem metadata (UUIDs, labels, types).
 
 #
@@ -1201,3 +1200,486 @@ lscpu:              Structured, high-level summary (uses sysfs)
 Use cat /proc/cpuinfo if you need flags like sse4_2, vmx, aes, etc.
 
 
+#
+
+    LSMEM
+    ======
+    lsmem is a Linux command-line tool used to display information about memory (RAM) blocks in the system.
+
+    It shows how memory is organized, online/offline, available, and reserved, especially useful on systems with hot-pluggable or NUMA memory.
+
+    Basic Usage
+
+lsmem
+
+RANGE                                       SIZE         STATE       REMOVABLE       BLOCK
+0x0000000000000000-0x000000007fffffff       2G           online      yes             0
+0x0000000100000000-0x000000017fffffff       2G           online      yes             1
+
+Memory block size:       2G
+Total online memory:     4G
+Total offline memory:    0B
+
+    What It Shows:
+    ---------------
+    Field	        Meaning
+    RANGE	        Physical address range of a memory block
+    SIZE	        Size of each memory block
+    STATE	        online (available) or offline (not available to the OS)
+    REMOVABLE	    Whether the memory block can be safely removed (hot-unplug)
+    BLOCK	        Logical block number assigned by the kernel
+
+    Useful Options
+    Option	                Description
+    -a or --all	            Show both online and offline memory blocks
+    -b	                    Display sizes in bytes
+    -J	                    JSON output
+    --split=STATE	        Show summary grouped by online/offline state
+    --output=FIELD,...	    Show only selected fields
+
+#
+
+    When is lsmem Useful?
+    ----------------------
+
+    On servers with hot-pluggable memory (common in virtual machines or enterprise systems).
+
+    To check which memory blocks are online/offline.
+
+    When managing NUMA nodes or doing low-level system tuning.
+
+    For debugging memory issues in advanced environments.
+
+#
+
+    FREE
+    =====
+    The **free** command displays a summary of the system’s memory usage, including:
+
+    RAM (main memory)
+    Swap space (virtual memory)
+    Buffers and cache used by the kernel
+
+    It's one of the simplest and fastest ways to check how much memory is used, free, and available.
+
+
+    Basic Usage
+    ------------
+free
+
+              total        used        free      shared  buff/cache   available
+Mem:        16337752     2187456     9211232      321652     4949056    13509264
+Swap:        2097148           0     2097148
+
+
+Columns Explained
+
+Column	            Meaning
+total	            Total memory or swap installed
+used	            Memory used (including buffers/cache unless using -h)
+free	            Completely unused memory
+shared	            Memory used by tmpfs (shared between processes)
+buff/cache	        Memory used by kernel buffers and filesystem cache
+available	        Estimated memory available for new apps (without swapping)
+
+
+    Total RAM vs Available RAM
+    ---------------------------
+
+    If you’re confused why "used" memory looks high — remember:
+
+    Linux uses free RAM as disk cache to speed things up. That memory is reclaimable and not "wasted".
+
+    "available" is a better measure of how much memory you really have free for apps.
+
+#
+
+    LSHW
+    =====
+    lshw (short for List Hardware) is a powerful command-line tool in Linux that displays detailed information about your system’s hardware — including CPU, memory, disks, network interfaces, motherboard, and more.
+
+    It’s like opening up your computer and reading the labels on each component — but from the terminal.
+
+
+    What Can lshw Show?
+
+    It pulls information from /proc, /sys, and DMI/SMBIOS, giving deep, low-level details, such as:
+
+    CPU: model, speed, capabilities
+    RAM: size, configuration, slots
+    Motherboard: vendor, model
+    BIOS: version, date
+    Storage: model, size, partitions
+    Network: interfaces, speed, capabilities
+
+
+    Basic Usage
+
+sudo lshw
+*-cpu
+   description: CPU
+   product: Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz
+   vendor: Intel Corp.
+   physical id: 1
+   bus info: cpu@0
+   size: 2112MHz
+   capacity: 4200MHz
+   width: 64 bits
+
+*-memory
+   description: System Memory
+   physical id: 2
+   size: 16GiB
+
+*-disk
+   description: ATA Disk
+   product: Samsung SSD 970
+   size: 512GiB
+
+
+    Useful Options
+
+    Command	                            Description
+    sudo lshw	                        Full detailed output
+    sudo lshw -short	                Summary table (one-liner per device)
+    sudo lshw -class cpu	            Show only CPU details
+    sudo lshw -class memory	            Only memory info
+    sudo lshw -class disk	            Only storage info
+    sudo lshw -html > system.html	    Export to HTML file
+    sudo lshw -json	                    Output in JSON format
+
+
+    When to Use lshw
+    -----------------
+
+    Hardware inventory collection
+
+    Checking available RAM slots or disk models
+
+    Verifying hardware before/after upgrades
+
+    Troubleshooting compatibility issues
+
+    Creating system reports (HTML/JSON)
+
+#
+
+    LINUX BOOT SEQUENCE
+    ====================
+
+1. BIOS / UEFI Initialization
+
+    What happens:
+
+    When you power on your computer, the BIOS (legacy) or UEFI (modern firmware) takes control.
+    It performs a POST (Power-On Self-Test) — checks CPU, RAM, and hardware.
+    It finds a bootable device (HDD, SSD, USB) using the boot order.
+    It loads the first-stage bootloader (from MBR or EFI partition) into memory and runs it.
+
+    Key Files:
+
+    BIOS → Master Boot Record (MBR)
+    UEFI → EFI System Partition (ESP)
+
+    
+2. Bootloader Stage (GRUB, systemd-boot, LILO, etc.)
+
+    What happens:
+    The bootloader is responsible for loading the Linux kernel into memory.
+    It can display a boot menu if you have multiple OSes or kernels.
+    It also loads an initial RAM filesystem (initramfs) to help the kernel boot.
+
+    Example (GRUB):
+
+    GRUB loads:
+    → Kernel image: /boot/vmlinuz-6.6.87
+    → Initramfs:    /boot/initrd.img-6.6.87
+    → Passes boot parameters to kernel
+
+
+3. Kernel Initialization
+
+    What happens:
+    The kernel takes over from the bootloader.
+    It uncompresses itself into memory.
+
+    Initializes:
+        CPU, memory management
+        Device drivers (for essential hardware)
+        Mounts initramfs as temporary root filesystem
+
+    Kernel tasks:
+    Detects and configures hardware
+    Mounts the real root filesystem (e.g., /dev/sda1)
+    Starts the first user-space process: init (PID 1)
+
+
+4. Initramfs (Initial RAM Filesystem)
+
+    What happens:
+    Temporary, small root filesystem stored in RAM.
+
+    Contains tools and scripts to:
+        Detect storage devices
+        Load drivers
+        Mount real root filesystem (/)
+
+    Once the real root is ready, it’s switched, and initramfs is discarded.
+
+
+5. System Initialization (init / systemd / upstart)
+
+    What happens:
+    The init system is the first process started by the kernel.
+    On modern Linux, this is typically systemd (PID 1).
+
+    It initializes:
+        Target units (like runlevels)
+        Services, daemons
+        Network, logging, user sessions
+
+    Older init systems:
+    SysVinit (/etc/init.d/)
+    Upstart (Ubuntu legacy)
+
+
+6. Runlevel or Target Activation
+
+    What happens:
+    The system enters a runlevel (SysVinit) or target (systemd).
+
+    Examples:
+        Multi-user mode (no GUI)
+        Graphical mode (with display manager)
+
+    Services like sshd, nginx, cron, etc., are started.
+
+
+7. User Login
+
+    What happens:
+
+    Once systemd reaches the target:
+        The getty process starts on terminals (for text login)
+        Or a display manager starts for GUI login (e.g., GDM, LightDM)
+
+    You can now log in, and your shell (bash, zsh) starts — in user space.
+
+#
+
+    LINUX BOOT SEQUENCE DIAGRAM
+    =============================
+
+    +--------------------------------------------------------------+
+    |                        Power ON                              |
+    +--------------------------------------------------------------+
+                    │
+                    ▼
+    +--------------------------------------------------------------+
+    | BIOS / UEFI                                                  |
+    |--------------------------------------------------------------|
+    | - Firmware on motherboard (EEPROM chip)                      |
+    | - Performs POST (Power-On Self-Test)                         |
+    | - Locates boot device via Boot Order                         |
+    | - Loads Bootloader from:                                     |
+    |     • BIOS → Master Boot Record (MBR) on disk (first 512 bytes)|
+    |       Path:  [sector 0 of disk]                              |
+    |     • UEFI → EFI System Partition (ESP)                      |
+    |       Path:  /boot/efi/EFI/<distro>/grubx64.efi              |
+    +--------------------------------------------------------------+
+                    │
+                    ▼
+    +--------------------------------------------------------------+
+    | Bootloader (e.g., GRUB, systemd-boot, LILO)                  |
+    |--------------------------------------------------------------|
+    | - Loads Kernel and Initramfs into memory                     |
+    | - Provides boot menu                                         |
+    | - Passes parameters to kernel                                |
+    | Files typically located at:                                  |
+    |   • /boot/grub/grub.cfg          ← GRUB configuration        |
+    |   • /boot/vmlinuz-<version>      ← Kernel image              |
+    |   • /boot/initrd.img-<version>   ← Initramfs (initrd)        |
+    +--------------------------------------------------------------+
+                    │
+                    ▼
+    +--------------------------------------------------------------+
+    | Linux Kernel Initialization                                  |
+    |--------------------------------------------------------------|
+    | - Kernel (vmlinuz) unpacks into memory                       |
+    | - Initializes CPU, memory, drivers                           |
+    | - Mounts temporary root (initramfs)                          |
+    | - Starts first user-space process: /sbin/init (PID 1)        |
+    | Files/paths:                                                 |
+    |   • /boot/vmlinuz-<version>     ← kernel binary              |
+    |   • /proc, /sys, /dev           ← virtual kernel filesystems |
+    +--------------------------------------------------------------+
+                    │
+                    ▼
+    +--------------------------------------------------------------+
+    | Initramfs (Initial RAM Filesystem)                           |
+    |--------------------------------------------------------------|
+    | - Temporary root filesystem (in RAM)                         |
+    | - Contains tools & scripts for early boot                    |
+    | - Mounts real root (e.g. /dev/sda1)                          |
+    | - Switches root to the real filesystem                       |
+    | Files/paths:                                                 |
+    |   • /boot/initrd.img-<version>  ← compressed cpio archive    |
+    |   • /init (inside initramfs)    ← script that mounts rootfs  |
+    |   • /etc/fstab                  ← mount instructions         |
+    +--------------------------------------------------------------+
+                    │
+                    ▼
+    +--------------------------------------------------------------+
+    | Init System (systemd / SysVinit / Upstart)                   |
+    |--------------------------------------------------------------|
+    | - First process started by kernel (PID 1)                    |
+    | - Initializes services and targets                           |
+    | - Prepares user environment                                  |
+    | Common file locations:                                       |
+    |   • /sbin/init → usually a symlink to /lib/systemd/systemd   |
+    |   • /etc/systemd/system/       ← custom unit files           |
+    |   • /lib/systemd/system/       ← default unit files          |
+    |   • /etc/inittab (for SysVinit)                              |
+    +--------------------------------------------------------------+
+                    │
+                    ▼
+    +--------------------------------------------------------------+
+    | Runlevel / Target Activation                                 |
+    |--------------------------------------------------------------|
+    | - Brings up all configured services and daemons              |
+    | - Mounts local & network filesystems                         |
+    | - Enables networking, logging, cron, etc.                    |
+    | Files/paths:                                                 |
+    |   • /etc/systemd/system/multi-user.target.wants/             |
+    |   • /etc/rc*.d/ (for SysVinit scripts)                       |
+    |   • /etc/fstab (for mounting drives)                         |
+    +--------------------------------------------------------------+
+                    │
+                    ▼
+    +--------------------------------------------------------------+
+    | User Space (Login / Shell / GUI)                             |
+    |--------------------------------------------------------------|
+    | - getty → login prompt on terminal                           |
+    | - GUI → Display Manager (GDM, LightDM)                       |
+    | - User logs in → shell (bash, zsh) starts                    |
+    | - Desktop environment starts (if GUI)                        |
+    | User-space binaries and configs:                             |
+    |   • /bin/, /usr/bin/        ← user commands (ls, cat, bash)  |
+    |   • /etc/passwd, /etc/shadow ← user info                     |
+    |   • /home/<user>/           ← user data                      |
+    +--------------------------------------------------------------+
+
+
+#
+
+ls -l /sbin/init                        // To check the init system used
+
+lrwxrwxrwx 1 root root 22 Jul 11 20:52 /sbin/init -> ../lib/systemd/systemd
+
+#
+
+    RUNLEVEL
+    =========
+    A runlevel is a mode of operation in traditional Linux systems (especially those using SysVinit) that defines what services and processes should be running.
+
+    Think of it as the system’s operational state —
+    for example, “single-user mode,” “multi-user mode,” or “graphical mode.”
+
+
+    How Runlevels Work (SysVinit System)
+    -------------------------------------
+
+    When the system boots:
+    The kernel starts the init process (PID 1).
+    The init program reads /etc/inittab to determine which runlevel to start in.
+    Based on the runlevel, init runs scripts from directories like /etc/rcX.d/
+    (where X = runlevel number).
+
+    Each runlevel defines what services should start or stop.
+
+
+    Standard Linux Runlevels
+    -------------------------
+    Runlevel	        Name / Mode	                        Description
+    0	                Halt	                            Shuts down the system
+    1	                Single-user mode	                Maintenance mode — only root user, no networking
+    2	                Multi-user (no network)	            Multiple users, no network services (rarely used)
+    3	                Multi-user (text mode)	            Normal multi-user mode with networking (no GUI)
+    4	                Undefined / Custom	                Not used by default — available for custom configs
+    5	                Graphical mode	                    Multi-user with networking and GUI (X11 or Wayland)
+    6	                Reboot	                            Reboots the system
+
+
+    Runlevel Directory Structure
+
+    Each runlevel has its own folder in /etc/:
+
+    /etc/rc0.d/    → scripts to run when entering runlevel 0
+    /etc/rc1.d/    → scripts for single-user mode
+    /etc/rc2.d/    → scripts for multi-user mode
+    /etc/rc3.d/    → scripts for full multi-user mode
+    /etc/rc5.d/    → scripts for GUI mode
+    /etc/rc6.d/    → scripts for reboot
+
+    Inside each directory:
+
+    Files starting with S → services to Start
+    Files starting with K → services to Kill (stop)
+
+    Example:
+    /etc/rc3.d/
+        ├── S01rsyslog
+        ├── S02network
+        ├── S20sshd
+        ├── K01gdm
+
+
+    SYSTEMD AND RUNLEVEL
+    ----------------------
+
+    Modern Linux distributions (Ubuntu 16+, RHEL 7+, Debian 8+, etc.) use systemd, which replaces SysVinit and runlevels with targets.
+
+    Runlevel	    Equivalent systemd Target	            Command to Use
+    0	            poweroff.target	                        systemctl isolate poweroff.target
+    1	            rescue.target	                        systemctl isolate rescue.target
+    3	            multi-user.target	                    systemctl isolate multi-user.target
+    5	            graphical.target	                    systemctl isolate graphical.target
+    6	            reboot.target	                        systemctl isolate reboot.target
+
+    +---------------------------------------------------------------+
+    |                   Linux Runlevels and systemd Targets         |
+    +---------------------------------------------------------------+
+    |                                                               |
+    |  ┌────────────┬──────────────────────────┬───────────────────┐|
+    |  │ Runlevel   │ SysV Description         │ systemd Target    │|
+    |  ├────────────┼──────────────────────────┼───────────────────┤|
+    |  │ 0          │ Halt / Poweroff          │ poweroff.target   │|
+    |  │ 1          │ Single-user / Rescue     │ rescue.target     │|
+    |  │ 2          │ Multi-user (no network)  │ multi-user.target*│|
+    |  │ 3          │ Full multi-user (text)   │ multi-user.target │|
+    |  │ 4          │ Undefined / Custom use   │ (custom target)   │|
+    |  │ 5          │ Graphical mode (GUI)     │ graphical.target  │|
+    |  │ 6          │ Reboot                   │ reboot.target     │|
+    |  └────────────┴──────────────────────────┴───────────────────┘|
+    |                                                               |
+    |  * Some distros (e.g., Debian) use runlevel 2 for normal mode |
+    |    with networking.                                           |
+    +---------------------------------------------------------------+
+
+
+#
+
+systemctl get-default               // To check the current target
+graphical.target
+
+
+ls -ltr /etc/systemd/system/default.target      // it shows the target file content
+/etc/systemd/system/default.target -> /lib/systemd/system/graphical.target
+
+
+systemctl set-default multi-user.target         // Change the target
+Created symlink /etc/systemd/system/default.target -> lib/systemd/system/multi-user.target
+
+
+#
+    Note : Runlevels define what services the system runs at boot, systemd replaced them with targets, but the concept is still the same.

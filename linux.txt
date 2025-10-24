@@ -1887,9 +1887,16 @@ ls /usr/bin | head
     Gentoo-based	    Gentoo	                                Source (compiled)	Portage (emerge)	                sudo emerge --ask vim
     Slackware-based	    Slackware	                            .tgz	            pkgtool / slackpkg	                sudo slackpkg install package
 
+
+#
+
+    rpm - RedHat Package Manager
+    YUM - Yellowdog Update modified
+
 #
 
     Functions of a Package Manager
+    ===============================
     Function	                Description	                                                Example Commands
     Install	                    Add new software packages to your system.	                sudo apt install nginx / sudo dnf install nginx / sudo pacman -S nginx
     Update	                    Update the package index (list of available packages).	    sudo apt update / sudo dnf check-update / sudo pacman -Sy
@@ -1918,3 +1925,137 @@ ls /usr/bin | head
     Arch / Manjaro	                                .pkg.tar.zst	    pacman	            (Single-level)	    pacman directly handles repositories, downloads, dependency resolution, and installs packages.	                pacman is both front-end and back-end — simple and fast.
     Alpine Linux	                                .apk	            apk	                (Single-level)	    apk manages repositories and installs lightweight .apk packages directly, designed for minimal systems.	        apk is optimized for container use and small footprint systems.
     Gentoo Linux	                                Source	            emerge (Portage)	(Build-based)	    emerge downloads source code, compiles it locally, and installs the resulting binaries.	                        Gentoo’s Portage offers maximum customization — everything built from source.
+
+
+#
+
+    Universal Package Managers
+    ===========================
+    Tool	        Works On	            Purpose	                                        Example Command
+    Snap	        Most Linux distros	    Containerized universal apps	                sudo snap install code --classic
+    Flatpak	        Most Linux distros	    Sandboxed desktop apps	                        flatpak install flathub org.mozilla.firefox
+    AppImage	    Any Linux distro	    Portable standalone apps (no install needed)	./AppName-x86_64.AppImage
+
+
+#
+
+    Linux Package Managers — Full Form & Repository Locations
+    Package Manager / Tool	            Full Form	                    Linux Family / Distro	            Package Format	            Repository Location(s)
+    APT	                                Advanced Package Tool	        Debian, Ubuntu, Kali, Mint	        .deb	                    Remote: /etc/apt/sources.list, /etc/apt/sources.list.d/
+                                                                                                                                        Local cache: /var/cache/apt/archives/
+
+    DPKG	                            Debian Package	                Debian-based	                    .deb	                    Installs from local files (no repos): manually downloaded .deb packages.
+    
+
+    YUM	                                Yellowdog Updater, Modified	    CentOS, RHEL (older)	            .rpm	                    Remote: /etc/yum.repos.d/*.repo
+                                                                                                                                        Local cache: /var/cache/yum/
+
+    DNF	                                Dandified YUM	                Fedora, RHEL 8+, Rocky, AlmaLinux	.rpm	                    Remote: /etc/yum.repos.d/*.repo
+                                                                                                                                        Metadata cache: /var/cache/dnf/
+
+    RPM	                                Red Hat Package Manager	        RHEL, Fedora, SUSE	                .rpm	                    Local installation only (no repo management): /var/lib/rpm/ holds installed package database.
+    
+
+    Zypper	                            (No expansion; SUSE tool)	    openSUSE, SLES	                    .rpm	                    Repo configs: /etc/zypp/repos.d/
+                                                                                                                                        Cache: /var/cache/zypp/
+
+    Pacman	                            Package Manager	                Arch Linux, Manjaro	                .pkg.tar.zst	            Remote: /etc/pacman.conf, /etc/pacman.d/mirrorlist
+                                                                                                                                        Local cache: /var/cache/pacman/pkg/
+
+    APK	                                Alpine Package Keeper	        Alpine Linux	                    .apk	                    Repos: /etc/apk/repositories
+                                                                                                                                        Cache: /var/cache/apk/
+
+    Emerge	                            (Part of Portage system)	    Gentoo Linux	                    Source	                    Repos (Portage tree): /var/db/repos/gentoo/ or /usr/portage/
+
+
+    Portage	                            (Name only)	                    Gentoo Linux	                    Source	                    Configuration: /etc/portage/
+                                                                                                                                        Builds source packages in /var/tmp/portage/
+                                                                                                                            
+    Snap	                            (Canonical tool; no expansion)	Most Linux distros	                .snap	                    Remote (store): https://api.snapcraft.io/
+                                                                                                                                        Local: /var/lib/snapd/snaps/
+
+    Flatpak	                            (No expansion; from Red Hat)	Most Linux distros	                .flatpakref, .flatpakrepo	Repos: /var/lib/flatpak/repo/, 
+                                                                                                                                        user: ~/.local/share/flatpak/
+    
+    AppImage	                        (Self-contained term)	        Any Linux distro	                .AppImage	                No repository — portable executables stored anywhere (e.g., ~/Applications/).
+
+
+#
+
+    Note : The repo links can be updated, pointing to a repository containing newer or unique packages.
+
+
+#
+
+    LINUX SHELL 
+    ============
+    A shell is a program that acts as an interface between you (the user) and the Linux operating system (kernel).
+    You type commands → the shell interprets them → the system executes them → results are shown back to you.
+
+    Think of it as your command interpreter or command-line environment.
+
+    User types a command (e.g., ls)
+    Shell interprets it and passes it to the Kernel
+    Kernel performs the requested task (list files)
+    Shell displays the output back to the user
+
+#
+
+    Common Types of Linux Shells
+    Shell	                            Path	                Description
+    Bourne Shell (sh)	                /bin/sh	                Original Unix shell by Stephen Bourne
+    Bash (Bourne Again Shell)	        /bin/bash	            Most common; improved version of sh
+    C Shell (csh / tcsh)	            /bin/csh	            Syntax similar to C language
+    Korn Shell (ksh)	                /bin/ksh	            Adds scripting and performance improvements
+    Z Shell (zsh)	                    /bin/zsh	            Modern shell with better completion and plugins
+    Fish (Friendly Interactive Shell)	/usr/bin/fish	            User-friendly, colorful, auto-suggestions
+
+
+#
+
+echo $SHELL                             // Check Which Shell You’re Using
+    Example output:
+    /bin/bash
+
+chsh -s /bin/zsh                        // Switching Shells (Change default shell to zsh)
+
+#
+
+    Linux Commands to Check File Size
+    Command	            Purpose / Description	                                                    Key Options Explained	                                    Example	Sample      Output / Notes
+    ls -lh	            Lists files in a directory with human-readable sizes (e.g., KB, MB, GB).	-l: Long listing format (permissions, owner, size, date)    ls -lh file.txt	    -rw-r--r-- 1 user user 2.3M Oct 18 10:15 file.txt
+                                                                                                -h: Human-readable (adds K/M/G suffixes)	
+
+    du -h file.txt	    Shows the disk space usage of a single file.	                            -h: Human-readable sizes	                                du -h file.txt	    2.4M file.txt
+                                                                                                                                                                                    🔹 Shows actual space used on disk (can differ from ls due to block allocation).
+
+    du -sh /path/to/dir	Displays the total size of a directory (without listing subfiles).	        -s: Summary only (don’t list each file)                     du -sh /var/log	    450M /var/log
+                                                                                                    -h: Human-readable	                                    
+    
+    du -ah	            Lists the size of all files and subdirectories under a path.	            -a: Include all files (not just directories)                du -ah /home/user	Shows every file’s size recursively.
+                                                                                                    -h: Human-readable
+                                                                                                    	        
+    `du -ah	sort -h`	Lists all files with sizes, sorted from smallest to largest.	            sort -h: Sorts human-readable sizes (e.g., 2K < 1M < 1G)	`du -ah
+    
+    stat file.txt	    Displays detailed metadata of a file including its size in bytes.	        (no specific flags needed)	                                stat file.txt	    Size: 2432000 Blocks: 4768
+                                                                                                                                                                                    🔹 Exact size (in bytes), not rounded.
+    
+    find . -type f -size +100M	Finds files larger than 100 MB within the current directory.	    -type f: File only
+                                                                                                    -size +100M: Larger than 100 MB	find .                      -type f -size +100M	Lists paths of all files >100 MB.
+
+    `find . -type f -size +100M -exec du -h {} +	sort -h`	Combines find and du to list large files with sizes, sorted ascending.	-exec ... +: Runs a command (here du -h) on each found file	`find . -type f -size +100M -exec du -h {} +
+    
+    ls -lhS	            Lists files sorted by size (largest first).	                                -S: Sort by file size (descending by default)	            ls -lhS	            Shows largest files at the top of the list.
+    
+    `du -ch *	        grep total`	                                                                Shows total size of all files in the current directory.	    -c: Adds a grand total              `du -ch *
+                                                                                                                                                                grep total: Filters the total line	
+
+#
+
+    Tips
+    =====
+
+    ls shows file sizes as stored in the filesystem’s metadata.
+    du shows disk space used, which can differ (e.g., due to sparse files or block size).
+    Always use the -h flag to make outputs easier to read (KB/MB/GB).
+    Combine du, sort, and find for quick analysis of space usage.

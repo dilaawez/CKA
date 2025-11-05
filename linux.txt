@@ -2022,6 +2022,8 @@ chsh -s /bin/zsh                        // Switching Shells (Change default shel
 #
 
     Linux Commands to Check File Size
+    ----------------------------------
+
     Command	            Purpose / Description	                                                    Key Options Explained	                                    Example	Sample      Output / Notes
     ls -lh	            Lists files in a directory with human-readable sizes (e.g., KB, MB, GB).	-l: Long listing format (permissions, owner, size, date)    ls -lh file.txt	    -rw-r--r-- 1 user user 2.3M Oct 18 10:15 file.txt
                                                                                                 -h: Human-readable (adds K/M/G suffixes)	
@@ -2059,3 +2061,150 @@ chsh -s /bin/zsh                        // Switching Shells (Change default shel
     du shows disk space used, which can differ (e.g., due to sparse files or block size).
     Always use the -h flag to make outputs easier to read (KB/MB/GB).
     Combine du, sort, and find for quick analysis of space usage.
+
+
+#
+
+
+    Linux Compression & Decompression Commands Reference
+    =====================================================
+
+    Tool	        Compression Command	    Decompression Command	        Key Options / Switches	    Description / Use-case	            Approx. Speed	    Compression Ratio	            Example
+    -----           --------------------    ----------------------          -----------------------     -----------------------             --------------      -------------------             ---------
+
+    gzip	        gzip file	            gunzip file.gz or 	            -9 (max compression), 	    Classic, fast single-threaded 	    🔹 Very fast	    🔸 Medium (2.5:1 – 3.5:1)	   gzip -9 report.txt → report.txt.gz
+                                            gzip -d file.gz                 -1 (fastest),               compressor, common for .gz 
+                                                                            -r (recursive),             and tar archives
+                                                                            -c (stdout)
+
+
+    bzip2	        bzip2 file	            bunzip2 file.bz2 or 	        -9 (max compression), 	    Slower than gzip but smaller 	    ⚪ Medium	        🔹 Better (3:1 – 5:1)	      bzip2 -9 data.log
+                                            bzip2 -d file.bz2               -1 (fastest),               files, often used for source 
+                                                                            -k (keep original),         code archives
+                                                                            -v (verbose)
+    
+    
+    xz	            xz file	                unxz file.xz or 	            -0 to -9 (levels), 	        Excellent ratio using LZMA2; 	    🔸 Slow	            🔹 High (4:1 – 8:1)	           xz -9 -T0 backup.img
+                                            xz -d file.xz                   -k, -T0 (multi-thread),     replaces bzip2 in many distros
+                                                                            -v
+
+    zip	            zip archive.zip file	unzip archive.zip	            -r (recursive), -9 (max), 	Cross-platform, supports multiple 	🔹 Fast	            🔸 Medium (2:1 – 3:1)	       zip -r logs.zip /var/log
+                                                                            -e (encrypt), -x (exclude)  files; Windows compatible
+
+
+    tar + gzip	    tar -czf archive.tar.gz tar -xzf archive.tar.gz	        -c (create), -x (extract), 	Combines multiple files into one 	🔹 Fast	            🔸 Medium	                   tar -czf project.tar.gz project/
+                    dir                                                     -z (gzip), -f (file)        .tar and compresses
+    
+    
+    tar + bzip2	    tar -cjf archive.tar.bz2 tar -xjf archive.tar.bz2	    -j (bzip2)	                Better compression than gzip, 	    ⚪ Medium	       🔹 Higher	                  tar -cjf src.tar.bz2 src/
+                    dir                                                                                 slower
+    
+    tar + xz	    tar -cJf archive.tar.xz tar -xJf archive.tar.xz	        -J (xz)	                    Very efficient compression for 	    🔸 Slow	            🔹 Highest	                   tar -cJf backup.tar.xz /home/user
+                    dir                                                                                 large archives
+    
+    7z (p7zip)	    7z a archive.7z file	7z x archive.7z	                -mx=9 (max), 	            Advanced multi-format tool  	    ⚪ Medium	       🔹 Very high (5:1 – 10:1)	  7z a -mx=9 logs.7z /var/log
+                                                                            -mmt=on (multi-thread),     (7z, zip, tar, etc.)
+                                                                            -p (password), -t7z (type)
+
+
+    rar (nonfree)	rar a archive.rar file	unrar x archive.rar	            -m5 (max), -p (password), 	Proprietary format, good ratio, 	⚪ Medium	       🔹 High	                      rar a -m5 data.rar data/
+                                                                            -r (recursive)              multi-volume support
+    
+    
+    zstd (Zstandard)    zstd file	        unzstd file.zst or 	            -1 (fastest) to -19 (max), 	Facebook-developed, extremely 	    🔹 Very fast	    🔹 High (2.5:1 – 5:1)	       zstd -19 large.log
+                                            zstd -d file.zst                -T0 (multi-thread),         fast with good ratio; modern 
+                                                                            --rm (remove input)         replacement for gzip
+    
+
+    lz4	                lz4 file	        lz4 -d 	                        -1 (fastest), -9 (max), 	Lightning-fast compression, 	    🟢 Extremely fast	🔸 Low (1.5:1 – 2.5:1)	       lz4 -9 database.dump
+                                            file.lz4                        -v                          lower ratio; used in kernels/logs
+
+    
+    lzop	            lzop file	        lzop -d file.lzo	            -1 (fastest) to -9, 	    Based on LZO algorithm; very fast, 	🟢 Extremely fast	🔸 Low–medium	                lzop -9 image.iso
+                                                                            -v, -k                      moderate ratio
+    
+
+    compress / 	        compress file	    uncompress file.Z	            -v (verbose), -f (force)	Legacy UNIX tool (.Z extension), 	⚪ Medium	       🔸 Low–medium	               compress notes.txt
+    uncompress                                                                                          rarely used now
+    
+
+    pigz 	            pigz file	        unpigz file.gz	                -p <n> (threads), -9, 	    Multi-core parallel version of      🔹 Very fast 	    🔸 Medium (same as gzip)	    pigz -p 8 -9 backup.tar
+    (Parallel gzip)                                                         -k, -v                      gzip; same format (.gz)             (multi-thread)
+    
+
+    pbzip2 	            pbzip2 file	        pbunzip2 file.bz2	            -p<N> (threads), -v, -k	    Multi-threaded version of bzip2	    ⚪ Medium–fast	   🔹 High	                       pbzip2 -p4 logs.txt
+    (Parallel bzip2)
+    
+
+    plzip / lzip	    lzip file	        lzip -d file.lz	                -9, -k, -v, -t (test)	    LZMA-based, high ratio,     	    🔸 Slow	            🔹 Very high	                lzip -9 image.iso
+                                                                                                        good integrity checking
+    
+
+    archiver 	        tar --zstd -cf 	    tar --zstd -xf 	                --zstd	                    Best combo: fast + good compression	🔹 Very fast	    🔹 High	tar                     --zstd -cf site.tar.zst /var/www
+    (tar+zstd)          archive.tar.zst     archive.tar.zst
+                        dir
+
+
+
+    Performance Summary (Typical Compression vs Speed Trade-offs)
+    ==============================================================
+
+    Category	                    Tools	                            Relative Speed	        Typical Ratio	        Best Use
+    --------                        ------                              ---------------         --------------          ---------
+
+    🟢 Very Fast	                lz4, lzop, pigz, zstd -1..3	        ⚡⚡⚡	                ~2:1	                Logs, backups where speed > ratio
+    ⚪ Balanced	                   gzip, pbzip2, zstd -10, 7z -mx=5	   ⚡⚡	                ~3–5:1	                General use, packaging
+    🔸 High Compression (Slower)	xz, 7z -mx=9, zstd -19	            ⚡	                  ~5–10:1	               Archival storage, containers
+    🔴 Legacy / Rare	            compress, rar, lzip	                ⚡	                   varies	               Compatibility or niche cases
+
+
+
+    Common “All-in-One” Examples
+    ==============================
+
+    Task	                                    Command	                                                Notes
+    -----                                       ---------                                               -------
+
+    Create a .tar.gz archive	                tar -czf archive.tar.gz /dir	                        Combines tar + gzip
+    Extract a .tar.xz archive	                tar -xJf archive.tar.xz	                                tar auto-detects compression
+    Compress with multi-thread gzip	            pigz -p 8 myfile	                                    Same .gz output but much faster
+    Compress with best modern trade-off	        zstd -19 bigfile	                                    High ratio, faster than xz
+    Archive directory with zstd	                tar --zstd -cf backup.tar.zst /home/user	            Modern, fast, and efficient
+    Benchmark compression	                    time gzip -9 bigfile	                                Measure speed vs. ratio
+    Test compressed file integrity	            gzip -t file.gz, xz -t file.xz, zstd -t file.zst	    All support test modes
+
+
+
+    Practical Tips
+    ===============
+
+    Always test after decompression:
+    gzip -t, xz -t, zstd -t, tar -tvf
+
+    To stream compression over network:
+    tar -cf - dir | zstd -19 -T0 | ssh user@host "cat > backup.tar.zst"
+
+    To view contents without extracting:
+    tar -tf archive.tar.gz
+
+    To combine decompression and extraction:
+    tar -xvf archive.tar.*
+
+    To compare ratios quickly:
+    ls -lh file* (compare original and compressed sizes)
+
+
+
+    Quick Recommendation by Scenario
+    =================================
+
+    Scenario	                                Recommended Tool
+    ---------                                   -----------------
+
+    General-purpose archival	                tar + zstd
+    Cross-platform zip sharing	                zip/unzip
+    Highest compression (archival)	            xz -9 or 7z -mx=9
+    Fastest compression (logs, temp backups)	lz4 or zstd -1
+    Multi-core compression	                    pigz, pbzip2, zstd -T0
+    Legacy UNIX support	                        gzip
+    Minimal CPU (low power systems)	            lzop

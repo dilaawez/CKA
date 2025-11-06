@@ -2063,7 +2063,7 @@ chsh -s /bin/zsh                        // Switching Shells (Change default shel
     Combine du, sort, and find for quick analysis of space usage.
 
 
-#
+#           [Day-10]
 
 
     Linux Compression & Decompression Commands Reference
@@ -2208,3 +2208,142 @@ chsh -s /bin/zsh                        // Switching Shells (Change default shel
     Multi-core compression	                    pigz, pbzip2, zstd -T0
     Legacy UNIX support	                        gzip
     Minimal CPU (low power systems)	            lzop
+
+
+#           [Day-11]
+
+
+ 1. Searching for Files by Name or Type
+ ========================================
+
+    Command	                                Description	                                                Example
+    --------                                ------------                                                --------
+    find /path -name "*.log"	            Find all .log files under a directory	                    find /var/log -name "*.log"
+    find . -type f -name "config*.json"	    Find files starting with “config” and ending in .json	    find . -type f -name "config*.json"
+    find /var/log -type f -mtime -1	        Files modified in the last 1 day	                        find /var/log -type f -mtime -1
+    find /etc -type f -size +10M	        Files larger than 10 MB	                                    find /etc -type f -size +10M
+    find . -perm 644	                    Files with permission 644	                                find . -perm 644
+    find / -user ubuntu	                    Files owned by the ubuntu user	                            find / -user ubuntu
+    find . -iname "*.txt"	                Case-insensitive search for .txt files	                    find . -iname "*.txt"
+    find . -maxdepth 2 -name "*.py"	        Limit recursion depth to 2 directories	                    find . -maxdepth 2 -name "*.py"
+    find /var -type f -exec ls -lh {} \;	Run a command (ls -lh) on each found file	                find /var -type f -exec ls -lh {} \;
+    find . -empty -type f	                Find empty files	                                        find . -empty -type f
+    find /tmp -atime -1	                    Files accessed within the last 24 hours	                    find /tmp -atime -1
+    find /home -mtime +30	                Files modified more than 30 days ago	                    find /home -mtime +30
+    find /var -size +1G	                    Files larger than 1 GB	                                    find /var -size +1G
+    find . -type d -name "backup"	        Find directories named “backup”	                            find . -type d -name "backup"
+    find /etc -type f ! -perm 644	        Files that don’t have 644 permission	                    find /etc -type f ! -perm 644
+
+
+    👉 Tip: Use -maxdepth to limit recursion depth.
+    Example: find . -maxdepth 2 -name "*.py"
+
+
+ 2. Searching for Text Patterns Inside Files
+ ============================================
+
+    Command	                                Description	                                                Example
+    grep "ERROR" app.log	                Search for lines containing “ERROR”	                        grep "ERROR" /var/log/syslog
+    grep -i "error" app.log	                Case-insensitive match	                                    grep -i "error" /var/log/messages
+    grep -r "TODO" /code	                Recursively search for “TODO” in a directory	            grep -r "TODO" ~/projects/
+    grep -R "main()" --include="*.c"	    Search only in .c files	                                    grep -R "main()" --include="*.c" src/
+    grep -v "DEBUG" app.log	                Show lines not containing “DEBUG”	                        grep -v "DEBUG" app.log
+    grep -n "pattern" file.txt	            Show matching lines with line numbers	                    grep -n "database" config.yaml
+    grep -c "pattern" file.txt	            Count number of matching lines	                            grep -c "ERROR" app.log
+    grep -l "pattern" *.txt	                List filenames that contain matches	                        grep -l "username" *.conf
+    `grep -E "WARN|ERROR" app.log`	        Use extended regex to match multiple patterns
+    grep -F "literal text" file.txt	        Fixed string match (no regex)	                            grep -F "server started" app.log
+    grep -Hn "def " *.py	                Show filename and line number for matches	                grep -Hn "def " *.py
+    grep -R "password" /etc	                Search recursively for “password” keyword	                grep -R "password" /etc
+    `grep -R "pattern" /dir	less`	        Paginate long search results
+    zgrep "ERROR" file.gz	                Search compressed .gz files	                                zgrep "ERROR" syslog.1.gz
+    grep -R --exclude-dir=".git" "import" .	Exclude directories from search	                            grep -R --exclude-dir=".git" "import" src/
+    grep -R --include="*.py" "class " .	    Include only .py files	                                    grep -R --include="*.py" "class " .
+    grep -A 2 -B 2 "ERROR" app.log	        Show 2 lines before and after matches	                    grep -A 2 -B 2 "ERROR" app.log
+    grep -o "pattern" file	                Print only matched text (not whole line)	                grep -o "aws-[a-z0-9-]*" terraform.tfstate
+
+
+
+
+    Common grep options
+    --------------------
+
+    Option	    Meaning
+    -------     -------
+    -i	        Ignore case
+    -r / -R	    Recursive search
+    -v	        Invert match
+    -n	        Show line numbers
+    -l	        Print only matching filenames
+    --color	    Highlight matches
+    -E	        Use extended regex (like egrep)
+
+
+ 3. Faster or More Advanced Pattern Search Tools
+ ================================================
+
+    Tool	                Description	                                    Example
+    -----                   ------------                                    --------
+    egrep / grep -E	        Supports extended regex.	                    `grep -E "WARN
+    fgrep / grep -F	        Fixed-string search (no regex).	                grep -F "Error:" log.txt
+    ack	                    Developer-friendly grep, respects .gitignore.	ack "import"
+    ag (Silver Searcher)	Very fast recursive search, ignores binaries.	ag "TODO" src/
+    ripgrep (rg)	        Fastest modern grep alternative.	            rg "pattern" ./
+
+
+ 4. Combining find + grep
+ ==========================
+
+    You can combine them to search within certain files only:
+
+        find . -name "*.py" -exec grep -Hn "def " {} \;
+
+
+    → Find all Python function definitions in current directory.
+
+    Or using xargs for efficiency:
+
+        find . -name "*.log" | xargs grep "ERROR"
+
+
+ 5. Searching by Metadata (mtime, size, etc.)
+ =============================================
+
+    Goal	                                        Command
+    -----                                           --------
+    Files modified in last 7 days	                find /home -mtime -7
+    Files modified over 30 days ago	                find /home -mtime +30
+    Files accessed in last day	                    find /tmp -atime -1
+    Files larger than 1GB	                        find /var -size +1G
+    Empty files	                                    find . -empty -type f
+
+
+ 6. Searching in Compressed Files
+ =================================
+
+    File Type	                Command	                    Example
+    ----------                  --------                    --------
+    .gz	                        zgrep "pattern" file.gz	    zgrep "ERROR" syslog.1.gz
+    .bz2	                    bzgrep "pattern" file.bz2	
+    .xz	                        xzgrep "pattern" file.xz
+
+
+ 7. Searching File Contents Case Studies
+ ========================================
+
+    Task	                            Command	                                        Description
+    -----                               -------                                         ------------
+    Find IP addresses in logs	        grep -Eo "([0-9]{1,3}\.){3}[0-9]{1,3}" *.log	Extract IP patterns.
+    Find all TODO comments	            grep -R "TODO" --include="*.py"	
+    Find “password” keyword in configs	grep -R -i "password" /etc	
+    Count number of matching lines	    grep -Rc "Error" .	Recursively count per file.
+
+
+ 8. Performance Tips
+ =====================
+
+    Use grep -F for fixed strings → much faster.
+    Use --include or --exclude to limit file types.
+    Pipe through less for large outputs:
+    grep -R "pattern" /path | less
+    Use rg or ag instead of grep for very large trees.
